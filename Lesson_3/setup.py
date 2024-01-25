@@ -1,11 +1,12 @@
 import pytest
 import requests
 class TestUserAuth:
-    def setup(self):
-        exclude_params = [
-            ("no_cookie"),
-            ("no_token")
-        ]
+    exclude_params = [
+        ("no_cookie"),
+        ("no_token")
+    ]
+    def setup_method(self):
+
         data = {
             "email": "vinkotov@example.com",
             "password": "1234"
