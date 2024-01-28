@@ -11,7 +11,7 @@ class TestUserAgent:
     ]
     @pytest.mark.parametrize('agent', agents)
     def test_user_agent(self, agent):
-        response = requests.get("https://playground.learnqa.ru/ajax/api/user_agent_check",headers={'User-Agent': agent})
+        response = requests.get("https://playground.learnqa.ru/ajax/api/user_agent_check", headers={'User-Agent': agent})
         try:
             assert 'platform' in response.json(), "There is no \'platform\' in response"
             assert 'browser' in response.json(), "There is no \'browser\' in response"
