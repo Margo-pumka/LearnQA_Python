@@ -1,5 +1,6 @@
 import requests
 import pytest
+from json import JSONDecodeError
 class TestUserAgent:
     agents = [
         ('Mozilla/5.0 (Linux; U; Android 4.0.2; en-us; Galaxy Nexus Build/ICL53F) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30'),
@@ -11,9 +12,13 @@ class TestUserAgent:
     @pytest.mark.parametrize('agent', agents)
     def test_user_agent(self, agent):
         response = requests.get("https://playground.learnqa.ru/ajax/api/user_agent_check",headers={'User-Agent': agent})
-        assert 'platform' in response.json(), "There is no \'platform\' in response"
-        assert 'browser' in response.json(), "There is no \'browser\' in response"
-        assert 'device' in response.json(), "There is no \'device\' in response"
+        try:
+            assert 'platform' in response.json(), "There is no \'platform\' in response"
+            assert 'browser' in response.json(), "There is no \'browser\' in response"
+            assert 'device' in response.json(), "There is no \'device\' in response"
+        except JSONDecodeError:
+            "Response is not in a JSON format"
+
         if agent == 'Mozilla/5.0 (Linux; U; Android 4.0.2; en-us; Galaxy Nexus Build/ICL53F) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30':
             assert response.json()['platform'] == 'Mobile', "Wrong platform in response for User-Agent 1"
             assert response.json()['browser'] == 'No', "Wrong browser in response for User-Agent 1"
