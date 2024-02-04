@@ -2,7 +2,7 @@ import datetime
 import os
 from requests import Response
 class Logger():
-    file_name = f"logs/log_" + str(datetime.datetime.now()) + ".log"
+    file_name = f"logs/log_" + str(datetime.datetime.now().strftime("%Y-%m_%d_%H-%M-%S")) + ".log"
     @classmethod
     def _write_log_to_file(cls, data:str):
         with open(cls.file_name, "a", encoding="utf-8") as logger_file:
