@@ -36,6 +36,47 @@ class TestUserEdit(BaseCase):
                                 cookies={"auth_sid": auth_sid})
         Assertions.assert_json_value_by_name(response4, "firstName", new_name, "Wrong name of user after edit")
 
+        # EDIT by no auth user
+        new_changed_name = "New changed Name"
+        response5 = MyRequests.put(f"/user/{user_id}",
+                                   data={"firstName": new_name})
+        Assertions.assert_code_status(response5, 400)
+        assert response5.content.decode("utf-8") == f"Auth token not supplied", \
+            f"Unexpected response content {response5.content}"
 
+        # REGISTER and LOGIN other user
+        data2 = self.prepare_registration_data()
+        response6 = MyRequests.post("/user/", data=data2)
+        del data2["username"]
+        del data2["firstName"]
+        del data2["lastName"]
+        response7 = MyRequests.post("/user/login", data=data2)
+        auth_sid2 = self.getCookie(response7, "auth_sid")
+        token2 = self.getHeader(response7, "x-csrf-token")
 
+        # EDIT by other user
+        new_changed_name = "New changed Name"
+        response8 = MyRequests.put(f"/user/{user_id}",
+                                   headers={"x-csrf-token": token2},
+                                   cookies={"auth_sid": auth_sid2},
+                                   data={"firstName": new_changed_name})
+        Assertions.assert_code_status(response8, 200)
+
+        # EDIT email without @
+        response9 = MyRequests.put(f"/user/{user_id}",
+                                   headers={"x-csrf-token": token},
+                                   cookies={"auth_sid": auth_sid},
+                                   data={"email": "ddddhhttfgfhttryytrty"})
+        Assertions.assert_code_status(response9, 400)
+        assert response9.content.decode("utf-8") == f"Invalid email format", \
+            f"Unexpected response content {response9.content}"
+
+        # EDIT username with 1 character
+        response10 = MyRequests.put(f"/user/{user_id}",
+                                   headers={"x-csrf-token": token},
+                                   cookies={"auth_sid": auth_sid},
+                                   data={"username": "h"})
+        Assertions.assert_code_status(response10, 400)
+        assert response10.content.decode("utf-8") == f"Too short value for field username", \
+            f"Unexpected response content {response10.content}"
 
