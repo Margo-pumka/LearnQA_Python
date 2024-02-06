@@ -77,6 +77,6 @@ class TestUserEdit(BaseCase):
                                    cookies={"auth_sid": auth_sid},
                                    data={"username": "h"})
         Assertions.assert_code_status(response10, 400)
-        assert response10.content.decode("utf-8") == f"Too short value for field username", \
+        assert response10.content.decode("utf-8") == '{"error":"Too short value for field username"}', \
             f"Unexpected response content {response10.content}"
 
